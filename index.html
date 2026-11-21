@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>わんこ○×クイズ｜トイプードルのムック</title>
+<meta name="description" content="犬の寿命・年齢・お金のこと、どのくらい知っていますか？出典つきの○×クイズ10問です。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f8f1e6; --card: #fffbf5; --brown: #78543c; --accent: #cd8c64;
+    --accent-d: #b06842; --pale: #f0e0ce; --gray: #aa9687; --soft: #fcecde;
+    --ok: #5f8f5a; --ng: #b5524a;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Noto Sans JP", sans-serif; color: var(--brown); line-height: 1.7; }
+  main { max-width: 560px; margin: 24px auto; padding: 28px 22px; background: var(--card); border: 4px solid var(--pale); border-radius: 24px; }
+  .progress { display: flex; justify-content: space-between; font-size: 14px; font-weight: 700; color: var(--accent-d); margin-bottom: 6px; }
+  .bar { height: 8px; background: var(--pale); border-radius: 4px; overflow: hidden; margin-bottom: 18px; }
+  .bar div { height: 100%; background: var(--accent); width: 0; transition: width .3s; }
+  .q { font-size: 20px; font-weight: 700; margin: 0 0 18px; min-height: 3.4em; }
+  .choices { display: flex; gap: 14px; }
+  .choices button { flex: 1; font-family: inherit; font-size: 44px; font-weight: 700; padding: 10px 0; border-radius: 18px; cursor: pointer;
+    border: 3px solid var(--pale); background: #fff; color: var(--brown); }
+  .choices button:disabled { cursor: default; opacity: .55; }
+  .choices button.picked { opacity: 1; border-color: var(--accent); background: var(--soft); }
+  .answer { margin-top: 18px; padding: 16px; border-radius: 16px; background: #fff; border: 2px solid var(--pale); display: none; }
+  .answer .judge { font-size: 22px; font-weight: 700; margin: 0 0 4px; }
+  .answer .judge.ok { color: var(--ok); }
+  .answer .judge.ng { color: var(--ng); }
+  .answer .exp { margin: 6px 0 0; font-size: 15px; }
+  .answer .src { margin: 8px 0 0; font-size: 12px; color: var(--gray); }
+  .btn { display: block; width: 100%; margin-top: 16px; padding: 13px; font-family: inherit; font-size: 16px; font-weight: 700; color: #fff;
+    background: var(--brown); border: none; border-radius: 999px; cursor: pointer; text-align: center; text-decoration: none; }
+  .btn.sub { background: #fff; color: var(--brown); border: 2px solid var(--pale); }
+  .result { text-align: center; }
+  .result .score { font-size: 56px; font-weight: 700; color: var(--accent-d); line-height: 1.2; margin: 6px 0; }
+  .result .msg { font-size: 16px; margin: 8px 0 16px; }
+  .review { text-align: left; margin-top: 20px; }
+  .review li { font-size: 14px; margin-bottom: 6px; }
+  .review .mark-ok { color: var(--ok); font-weight: 700; }
+  .review .mark-ng { color: var(--ng); font-weight: 700; }
+  .more { text-align: left; font-size: 14px; margin-top: 20px; padding-top: 12px; border-top: 2px solid var(--pale); }
+  .more a { color: var(--accent-d); }
+  .caution { font-size: 12px; color: var(--gray); margin-top: 18px; }
+  .error { background: #fde2e2; color: #a33; padding: 12px; border-radius: 12px; font-weight: 700; display: none; margin-bottom: 12px; }
+  /* 見出し（noteの見出し画像と同じ形：左に丸いプードル、右にシリーズ名・タイトル） */
+  body { background-color: var(--bg); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='420' viewBox='0 0 420 420'%3E%3Cg fill='%23e8d6c2'%3E%3Cg transform='translate(60 70) rotate(-20) scale(1.6)'%3E%3Cellipse cx='0' cy='8' rx='13' ry='11'/%3E%3Cellipse cx='-14' cy='-6' rx='5' ry='6'/%3E%3Cellipse cx='-5' cy='-15' rx='5' ry='6'/%3E%3Cellipse cx='5' cy='-15' rx='5' ry='6'/%3E%3Cellipse cx='14' cy='-6' rx='5' ry='6'/%3E%3C/g%3E%3Cg transform='translate(300 40) rotate(10) scale(1.0)'%3E%3Cellipse cx='0' cy='8' rx='13' ry='11'/%3E%3Cellipse cx='-14' cy='-6' rx='5' ry='6'/%3E%3Cellipse cx='-5' cy='-15' rx='5' ry='6'/%3E%3Cellipse cx='5' cy='-15' rx='5' ry='6'/%3E%3Cellipse cx='14' cy='-6' rx='5' ry='6'/%3E%3C/g%3E%3Cg transform='translate(380 230) rotate(25) scale(1.4)'%3E%3Cellipse cx='0' cy='8' rx='13' ry='11'/%3E%3Cellipse cx='-14' cy='-6' rx='5' ry='6'/%3E%3Cellipse cx='-5' cy='-15' rx='5' ry='6'/%3E%3Cellipse cx='5' cy='-15' rx='5' ry='6'/%3E%3Cellipse cx='14' cy='-6' rx='5' ry='6'/%3E%3C/g%3E%3Cg transform='translate(150 300) rotate(-10) scale(1.1)'%3E%3Cellipse cx='0' cy='8' rx='13' ry='11'/%3E%3Cellipse cx='-14' cy='-6' rx='5' ry='6'/%3E%3Cellipse cx='-5' cy='-15' rx='5' ry='6'/%3E%3Cellipse cx='5' cy='-15' rx='5' ry='6'/%3E%3Cellipse cx='14' cy='-6' rx='5' ry='6'/%3E%3C/g%3E%3Cg transform='translate(250 390) rotate(15) scale(0.9)'%3E%3Cellipse cx='0' cy='8' rx='13' ry='11'/%3E%3Cellipse cx='-14' cy='-6' rx='5' ry='6'/%3E%3Cellipse cx='-5' cy='-15' rx='5' ry='6'/%3E%3Cellipse cx='5' cy='-15' rx='5' ry='6'/%3E%3Cellipse cx='14' cy='-6' rx='5' ry='6'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"); background-size: 420px 420px; }
+  .hero { display: flex; align-items: center; gap: 18px; margin: -4px 0 22px; }
+  .hero-face { flex: none; width: 118px; height: 118px; border-radius: 50%; background: #efe2d3;
+    border: 4px solid #fff; box-shadow: 0 0 0 4px var(--accent); display: flex; align-items: center; justify-content: center; }
+  .hero-face img { width: 86%; height: auto; }
+  .hero-text { min-width: 0; }
+  .hero-series { margin: 0 0 8px; padding-bottom: 6px; border-bottom: 2px solid var(--accent); color: var(--brown); font-size: 12px; font-weight: 700; }
+  .hero-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 52px; height: 52px; padding: 0 8px; border-radius: 26px;
+    background: var(--accent); color: #fff; font-weight: 700; font-size: 15px; }
+  .hero h1 { margin: 6px 0 2px; font-size: 24px; line-height: 1.35; color: var(--brown); font-weight: 700; }
+  .hero-sub { margin: 0; color: var(--accent); font-size: 15px; font-weight: 700; }
+  .intro { color: var(--brown); font-size: 15px; margin: 0 0 8px; }
+  @media (max-width: 420px) {
+    .hero { flex-direction: column; text-align: center; gap: 12px; }
+    .hero-series { display: inline-block; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <header class="hero">
+    <div class="hero-face"><img src="mukku.png" alt="トイプードルのムックのイラスト"></div>
+    <div class="hero-text">
+      <p class="hero-series">トイプードルのムックと、後悔なく過ごすために</p>
+      <span class="hero-badge">クイズ</span>
+      <h1>わんこ○×クイズ</h1>
+      <p class="hero-sub">寿命・年齢・お金のこと、知ってる？</p>
+    </div>
+  </header>
+
+  <div class="error" id="error"></div>
+  <div id="app"></div>
+
+  <p class="caution">※ 答えと解説は、公的な資料や調査・研究で確かめた数字をもとにしています。数字は平均などの目安で、一頭一頭の体質や暮らしによってちがいます。</p>
+  <div class="more">
+    作成：Moy（トイプードルのムックの飼い主）<br>
+    <a href="https://www.threads.com/@toypoo_mukku" target="_blank" rel="noopener">Threads @toypoo_mukku</a>
+    <a href="https://note.com/toypoo_mukku" target="_blank" rel="noopener">note</a>
+  </div>
+</main>
+
+<script>
+  // 問題はすべて、出典で確かめた数字だけで作っています。a: true=○ / false=×
+  var POOL = [
+    { q: "トイ・プードルの平均寿命は、15歳より長い。", a: true,
+      exp: "トイ・プードルの平均寿命は15.3歳で、犬全体の平均（14.1歳）より長めです。",
+      src: "アニコム「家庭どうぶつ白書2025」（2023年度、保険に入っている犬のデータ）" },
+    { q: "柴の平均寿命は、チワワより短い。", a: false,
+      exp: "柴は14.7歳、チワワは13.7歳で、柴のほうが1歳長いという結果でした。",
+      src: "アニコム「家庭どうぶつ白書2025」表2-4-2" },
+    { q: "体が大きい犬ほど、平均寿命は長い。", a: false,
+      exp: "実は反対で、体が大きい犬ほど平均寿命は短めです。ゴールデン・レトリーバーは10.7歳、バーニーズ・マウンテン・ドッグは8.4歳でした。",
+      src: "アニコム「家庭どうぶつ白書2025」表2-4-2" },
+    { q: "小・中型犬の4歳は、人間でいうと20歳くらい。", a: false,
+      exp: "人間でいうと32歳くらいです。1歳で15歳、2歳で24歳と、最初の2年で一気に大人になります。",
+      src: "環境省「捨てず 増やさず 飼うなら一生」p.7" },
+    { q: "犬は7歳前後から、高齢期といわれている。", a: true,
+      exp: "環境省のパンフレットでは、犬は7歳前後から高齢期とされています。ふだんの健康チェックに、今まで以上に気を配りたい時期です。",
+      src: "環境省「飼う前も、飼ってからも考えよう」p.7" },
+    { q: "大型犬の7歳は、人間でいうと54歳くらい。", a: true,
+      exp: "大型犬の7歳は54歳くらいです。小・中型犬の7歳は44歳くらいなので、同じ7歳でも人間でいうと10歳ちがいます。",
+      src: "環境省「捨てず 増やさず 飼うなら一生」p.7" },
+    { q: "10歳以上の犬の1年間の診療費は、平均で0〜4歳の3倍以上になる。", a: true,
+      exp: "1年間の診療費の平均は、0〜4歳が52,613円、10歳以上が172,742円で、約3.3倍です。",
+      src: "アニコム「家庭どうぶつ白書2025」図2-3-2（保険の請求があった犬の診療費）" },
+    { q: "1年間に犬1頭にかけるお金のうち、いちばん多いのは「フード・おやつ」代。", a: false,
+      exp: "いちばん多いのは「ケガや病気の治療費」で89,120円でした。「フード・おやつ」は80,029円で2番目です。",
+      src: "アニコム損保「2025最新版 ペットにかける年間支出調査」（保険の契約者へのアンケート）" },
+    { q: "犬の認知症は、見逃されやすい。", a: true,
+      exp: "オーストラリアの研究では、飼い主へのアンケートから認知症が疑われた犬は14.2%いましたが、獣医師に認知症と診断されていたのは1.9%だけでした。",
+      src: "Salvin HE ほか（2010）Vet J 184(3)" },
+    { q: "10kg未満のミックス犬の平均寿命は、犬全体の平均より短い。", a: false,
+      exp: "10kg未満のミックス犬は14.8歳で、犬全体の平均（14.1歳）より少し長いという結果でした。",
+      src: "アニコム「家庭どうぶつ白書2025」表2-4-2・図2-4-1" },
+    { q: "ポメラニアンやチワワなどの小型犬は、パテラ（膝のお皿がずれる病気）と診断されやすい。", a: true,
+      exp: "イギリスの動物病院に通う犬21万頭あまりの記録を調べた研究では、ポメラニアン・チワワ・ヨークシャー・テリアなど11の犬種が、雑種より診断されやすいという結果でした。",
+      src: "O'Neill DG ほか（2016）イギリスの研究" },
+    { q: "10歳以上の犬で、保険の請求がいちばん多いのは「嘔吐・下痢・血便」。", a: true,
+      exp: "10歳以上の犬では、1位が「嘔吐・下痢・血便」、2位が「弁膜症」でした。",
+      src: "アニコム「家庭どうぶつ白書2025」図2-3-4" }
+  ];
+  var COUNT = 10;
+  var app = document.getElementById("app");
+  var PAGE_URL = location.href.split("#")[0].split("?")[0];
+
+  // 問題の数の確認（足りないときは画面に知らせる）
+  if (POOL.length < COUNT) {
+    var er = document.getElementById("error");
+    er.textContent = "問題の読み込みに問題があります。作成者にお知らせください。";
+    er.style.display = "block";
+    COUNT = POOL.length;
+  }
+
+  var questions, idx, results;
+
+  function shuffle(list) {
+    var a = list.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  function esc(s) {
+    var d = document.createElement("div");
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  function start() {
+    questions = shuffle(POOL).slice(0, COUNT);
+    idx = 0;
+    results = [];
+    showQuestion();
+  }
+
+  function showQuestion() {
+    var item = questions[idx];
+    app.innerHTML =
+      '<div class="progress"><span>第' + (idx + 1) + "問</span><span>" + (idx + 1) + " / " + COUNT + "</span></div>" +
+      '<div class="bar"><div style="width:' + (idx / COUNT * 100) + '%"></div></div>' +
+      '<p class="q">' + esc(item.q) + "</p>" +
+      '<div class="choices"><button type="button" data-v="1" aria-label="まる">○</button><button type="button" data-v="0" aria-label="ばつ">×</button></div>' +
+      '<div class="answer" id="answer"></div>';
+    var buttons = app.querySelectorAll(".choices button");
+    buttons.forEach(function (b) {
+      b.addEventListener("click", function () { answer(b.getAttribute("data-v") === "1", b, buttons); });
+    });
+  }
+
+  function answer(pick, btn, buttons) {
+    var item = questions[idx];
+    var ok = pick === item.a;
+    results.push(ok);
+    buttons.forEach(function (b) { b.disabled = true; });
+    btn.classList.add("picked");
+    var box = document.getElementById("answer");
+    box.innerHTML =
+      '<p class="judge ' + (ok ? "ok" : "ng") + '">' + (ok ? "正解！" : "ざんねん！") + "　答えは " + (item.a ? "○" : "×") + "</p>" +
+      '<p class="exp">' + esc(item.exp) + "</p>" +
+      '<p class="src">出典：' + esc(item.src) + "</p>" +
+      '<button type="button" class="btn" id="next">' + (idx + 1 < COUNT ? "次の問題へ" : "結果を見る") + "</button>";
+    box.style.display = "block";
+    document.getElementById("next").addEventListener("click", function () {
+      idx++;
+      if (idx < COUNT) showQuestion(); else showResult();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }
+
+  function message(score) {
+    if (score === COUNT) return "全問正解！すごい、わんこ博士ですね🐾";
+    if (score >= COUNT * 0.7) return "よく知っていますね！まちがえた問題は、下のふりかえりで解説を読んでみてください。";
+    if (score >= COUNT * 0.4) return "知らないこともあったかもしれません。うちの子の年齢やこれからのことを考えるきっかけになれば、うれしいです。";
+    return "知らない数字が多かったかもしれません。わたしも調べるまで知りませんでした。下のふりかえりで、解説を読んでみてください。";
+  }
+
+  function showResult() {
+    var score = results.filter(function (r) { return r; }).length;
+    var review = questions.map(function (item, i) {
+      return "<li><span class=\"" + (results[i] ? "mark-ok\">○" : "mark-ng\">×") + "</span> " + esc(item.q) +
+        "（答え：" + (item.a ? "○" : "×") + "）<br><small>" + esc(item.exp) + "</small></li>";
+    }).join("");
+    var text = "わんこ○×クイズ、" + COUNT + "問中" + score + "問正解でした🐾\n" + PAGE_URL;
+    app.innerHTML =
+      '<div class="result"><p>あなたの結果</p>' +
+      '<div class="score">' + score + " / " + COUNT + "</div>" +
+      '<p class="msg">' + esc(message(score)) + "</p>" +
+      '<a class="btn" target="_blank" rel="noopener" href="https://www.threads.net/intent/post?text=' + encodeURIComponent(text) + '">Threadsで結果をシェアする</a>' +
+      '<button type="button" class="btn sub" id="again">もう一度あそぶ（問題が入れかわります）</button></div>' +
+      '<div class="review"><b>ふりかえり</b><ul>' + review + "</ul></div>" +
+      '<div class="more"><b>うちの子のことを調べてみる</b><br>' +
+      '<a href="https://okimukku.github.io/dog-age/" target="_blank" rel="noopener">人間年齢チェッカー</a>　' +
+      '<a href="https://okimukku.github.io/dog-money/" target="_blank" rel="noopener">診療費シミュレーター</a>　' +
+      '<a href="https://okimukku.github.io/dog-senior/" target="_blank" rel="noopener">シニア期サイン チェック</a></div>';
+    document.getElementById("again").addEventListener("click", function () {
+      start();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }
+
+  start();
+</script>
+</body>
+</html>
